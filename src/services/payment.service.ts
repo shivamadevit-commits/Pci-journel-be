@@ -1,6 +1,8 @@
 import type { PaymentStatus } from '@prisma/client';
 import { env } from '../config/env';
+import { logger } from '../config/logger';
 import { prisma, type Tx } from '../config/prisma';
+import '../providers/cashfree.provider'; // registers the adapter
 import { getPaymentProvider } from '../providers/payment.provider';
 import { links } from '../templates/links';
 import { transact, type Actor } from '../utils/context';
@@ -112,18 +114,64 @@ export async function startCheckout(user: Express.AuthUser, articleId: string) {
   if (!payment || payment.status === 'PAID' || payment.status === 'WAIVED' || payment.status === 'REFUNDED') {
     throw new ConflictError('No payment is due for this submission', 'PAYMENT_NOT_DUE');
   }
-  if (!payment.amount || !payment.currency) {
-    throw new ConflictError('The APC amount has not been set yet', 'APC_AMOUNT_NOT_SET');
+  // The record is a snapshot taken at submission; fill only what it is missing from the current admin config
+  // (an amount or currency already on the record, e.g. set by the editorial office, is never overridden).
+  const cfg = await getConfig();
+  const amount = payment.amount?.toString() ?? cfg.apcDefaultAmount?.toString();
+  const currency = payment.currency ?? cfg.apcCurrency ?? undefined;
+  if (!amount || !currency) {
+    throw new ConflictError(`The APC ${!amount ? 'amount' : 'currency'} has not been set yet`, 'APC_AMOUNT_NOT_SET');
   }
+  if (amount !== payment.amount?.toString() || currency !== payment.currency) {
+    await prisma.apcPayment.update({ where: { articleId }, data: { amount, currency } });
+  }
+  const profile = await prisma.authorProfile.findUnique({ where: { userId: user.id }, select: { phone: true } });
   const session = await provider.createCheckout({
     articleId,
     submissionId: article.submissionId,
-    amount: payment.amount.toString(),
-    currency: payment.currency,
+    amount,
+    currency,
     payerEmail: user.email,
+    payerId: user.id,
+    payerName: `${user.firstName} ${user.lastName}`.trim(),
+    payerPhone: profile?.phone ?? undefined,
   });
   await prisma.apcPayment.update({ where: { articleId }, data: { provider: provider.name, providerReference: session.providerReference } });
-  return { checkoutUrl: session.checkoutUrl };
+  return { checkoutUrl: session.checkoutUrl, paymentSessionId: session.paymentSessionId, mode: session.mode, orderId: session.providerReference };
+}
+
+const sameAmount = (a: string | undefined, b: string | undefined) => a !== undefined && b !== undefined && Math.abs(Number(a) - Number(b)) < 0.005;
+
+/**
+ * Author-triggered reconciliation after returning from the gateway: asks the provider for the order's real outcome
+ * (the webhook may be delayed) and applies it through the same validated transition path as the webhook.
+ */
+export async function verifyPayment(user: Express.AuthUser, articleId: string) {
+  await loadOwnArticle(articleId, user.id);
+  const provider = getPaymentProvider();
+  const payment = await prisma.apcPayment.findUnique({ where: { articleId } });
+  if (!payment) throw new NotFoundError('Payment record not found');
+  const ref = payment.providerReference;
+  if (!ref || payment.provider !== provider.name || !provider.fetchStatus) return { status: payment.status };
+
+  const outcome = await provider.fetchStatus(ref);
+  logger.info({ articleId, orderId: ref, gatewayOutcome: outcome?.status ?? 'IN_PROGRESS', recorded: payment.status }, 'payment verify');
+  if (!outcome) return { status: payment.status };
+  return transact(async (tx) => {
+    // Re-read inside the transaction: the webhook may have settled the payment while we were calling the gateway.
+    const current = await tx.apcPayment.findUniqueOrThrow({ where: { articleId } });
+    if (current.providerReference !== ref) return { status: current.status };
+    if (outcome.status === 'PAID' && !sameAmount(outcome.amount, current.amount?.toString())) {
+      await recordAudit(tx, { action: AuditAction.PAYMENT_WEBHOOK, entityType: 'ApcPayment', entityId: current.id, metadata: { provider: provider.name, source: 'verify', rejected: 'amount_mismatch', paid: outcome.amount } });
+      return { status: current.status };
+    }
+    try {
+      await applyChange(tx, articleId, { status: outcome.status, amount: outcome.amount, currency: outcome.currency, provider: provider.name }, null, 'webhook');
+    } catch (err) {
+      if (!(err instanceof ConflictError)) throw err;
+    }
+    return { status: (await tx.apcPayment.findUniqueOrThrow({ where: { articleId } })).status };
+  });
 }
 
 /**
@@ -133,18 +181,25 @@ export async function startCheckout(user: Express.AuthUser, articleId: string) {
 export async function handlePaymentWebhook(rawBody: Buffer | undefined, headers: Record<string, string | string[] | undefined>) {
   if (!rawBody) throw new UnauthorizedError('Invalid webhook', 'WEBHOOK_INVALID');
   const provider = getPaymentProvider();
-  let event;
+  let verified;
   try {
-    event = provider.verifyWebhook(rawBody, headers);
+    verified = provider.verifyWebhook(rawBody, headers);
   } catch {
     throw new UnauthorizedError('Invalid webhook signature', 'WEBHOOK_INVALID');
   }
+  if (!verified) return { duplicate: false, matched: false, ignored: true };
+  const event = verified;
   return transact(async (tx) => {
     const seen = await tx.paymentWebhookEvent.createMany({ data: [{ provider: provider.name, eventId: event.eventId }], skipDuplicates: true });
     if (seen.count === 0) return { duplicate: true };
 
     const payment = await tx.apcPayment.findUnique({ where: { providerReference: event.providerReference } });
     if (!payment) return { duplicate: false, matched: false };
+    if (event.status === 'PAID' && !sameAmount(event.amount, payment.amount?.toString())) {
+      // Never mark an APC paid for a different amount than was charged.
+      await recordAudit(tx, { action: AuditAction.PAYMENT_WEBHOOK, entityType: 'ApcPayment', entityId: payment.id, metadata: { provider: provider.name, eventId: event.eventId, rejected: 'amount_mismatch', paid: event.amount, expected: payment.amount?.toString() } });
+      return { duplicate: false, matched: true, applied: false };
+    }
     try {
       await applyChange(tx, payment.articleId, { status: event.status, amount: event.amount, currency: event.currency, provider: provider.name }, null, 'webhook');
     } catch (err) {

@@ -27,6 +27,7 @@ export const authorRoutes = [
   route({ method: 'post', path: '/author/articles/:articleId/versions', tag, roles: [...AUTHOR], status: 201, summary: 'Upload a revised manuscript (only when the Editor requested a revision)', params: a.articleIdParam, body: a.revisionBody, upload: manuscriptUpload, errors: [409, 413, 422], handler: c.uploadRevision }),
 
   route({ method: 'get', path: '/author/articles/:articleId/payment', tag, roles: [...AUTHOR], summary: 'APC / payment status', params: a.articleIdParam, handler: c.payment }),
+  route({ method: 'post', path: '/author/articles/:articleId/payment/verify', tag, roles: [...AUTHOR], summary: 'Reconcile APC payment status with the gateway after returning from checkout', params: a.articleIdParam, errors: [503], handler: c.verifyPayment }),
   route({ method: 'post', path: '/author/articles/:articleId/payment/checkout', tag, roles: [...AUTHOR], summary: 'Start online APC payment through the configured gateway', params: a.articleIdParam, errors: [409, 503], handler: c.checkout }),
 
   route({ method: 'get', path: '/author/articles/:articleId/proofs', tag, roles: [...AUTHOR], summary: 'Proofs delivered to me, with correction status', params: a.articleIdParam, handler: c.proofs }),

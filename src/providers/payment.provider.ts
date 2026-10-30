@@ -1,6 +1,5 @@
 import type { PaymentStatus } from '@prisma/client';
 import { env } from '../config/env';
-import { logger } from '../config/logger';
 import { ServiceUnavailableError } from '../utils/errors';
 
 export interface CheckoutInput {
@@ -9,6 +8,9 @@ export interface CheckoutInput {
   amount: string;
   currency: string;
   payerEmail: string;
+  payerId: string;
+  payerName: string;
+  payerPhone?: string;
 }
 
 export interface VerifiedPaymentEvent {
@@ -21,18 +23,20 @@ export interface VerifiedPaymentEvent {
 }
 
 /**
- * Integration point for the APC payment gateway. PCI has not selected a gateway, APC amount, refund rules or
- * failure handling, so no vendor adapter is shipped. Implement this interface for the chosen gateway and register it
- * with `registerPaymentProvider("<name>", adapter)`, then set PAYMENT_PROVIDER=<name>.
+ * Integration point for the APC payment gateway. Adapters register themselves with
+ * `registerPaymentProvider("<name>", adapter)`; PAYMENT_PROVIDER=<name> selects the active one.
+ * Shipped adapters: `cashfree` (providers/cashfree.provider.ts).
  */
 export interface PaymentProvider {
   readonly name: string;
-  createCheckout(input: CheckoutInput): Promise<{ checkoutUrl: string; providerReference: string }>;
+  createCheckout(input: CheckoutInput): Promise<{ checkoutUrl?: string; providerReference: string; paymentSessionId?: string; mode?: string }>;
   /**
    * Authenticates a webhook delivery (signature over the raw body using PAYMENT_WEBHOOK_SECRET) and returns the
-   * normalised event. MUST throw if the signature is invalid.
+   * normalised event, or `null` for authentic events that need no action. MUST throw if the signature is invalid.
    */
-  verifyWebhook(rawBody: Buffer, headers: Record<string, string | string[] | undefined>): VerifiedPaymentEvent;
+  verifyWebhook(rawBody: Buffer, headers: Record<string, string | string[] | undefined>): VerifiedPaymentEvent | null;
+  /** Asks the gateway for the current outcome of an order (`null` while still in progress). */
+  fetchStatus?(providerReference: string): Promise<{ status: PaymentStatus; amount?: string; currency?: string } | null>;
 }
 
 const registry = new Map<string, PaymentProvider>();
@@ -48,8 +52,4 @@ export function getPaymentProvider(): PaymentProvider {
     );
   }
   return p;
-}
-
-if (env.PAYMENT_PROVIDER !== 'none' && !registry.has(env.PAYMENT_PROVIDER)) {
-  logger.warn({ provider: env.PAYMENT_PROVIDER }, 'PAYMENT_PROVIDER is set but no adapter is registered');
 }

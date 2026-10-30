@@ -103,6 +103,15 @@ const schema = z.object({
   PAYMENT_PROVIDER: z.string().default('none'),
   PAYMENT_API_KEY: optionalString,
   PAYMENT_WEBHOOK_SECRET: optionalString,
+  CASHFREE_APP_ID: optionalString,
+  CASHFREE_SECRET_KEY: optionalString,
+  CASHFREE_ENV: z.string().default('SANDBOX'),
+  CASHFREE_BASE_URL: optionalString,
+  CASHFREE_API_VERSION: z.string().default('2023-08-01'),
+  CASHFREE_RETURN_URL: optionalString,
+  CASHFREE_NOTIFY_URL: optionalString,
+  CASHFREE_TIMEOUT_MS: int(15000, 1000),
+  CASHFREE_FALLBACK_PHONE: z.string().regex(/^\d{10}$/).default('9999999999'),
   PLAGIARISM_PROVIDER: z.string().default('none'),
   PLAGIARISM_API_BASE_URL: optionalString,
   PLAGIARISM_API_KEY: optionalString,
@@ -128,7 +137,11 @@ if (e.STORAGE_DRIVER === 'oci') {
   }
 }
 if (e.APC_DEFAULT_AMOUNT !== undefined && !e.APC_CURRENCY) problems.push('APC_CURRENCY is required when APC_DEFAULT_AMOUNT is set');
-if (e.PAYMENT_PROVIDER !== 'none' && !e.PAYMENT_WEBHOOK_SECRET) problems.push('PAYMENT_WEBHOOK_SECRET is required when PAYMENT_PROVIDER is configured');
+if (e.PAYMENT_PROVIDER === 'cashfree') {
+  // Cashfree signs webhooks with the account secret key, so no separate PAYMENT_WEBHOOK_SECRET exists.
+  for (const k of ['CASHFREE_APP_ID', 'CASHFREE_SECRET_KEY'] as const) if (!e[k]) problems.push(`${k} is required when PAYMENT_PROVIDER=cashfree`);
+  if (e.NODE_ENV === 'production' && !/^PROD(UCTION)?$/i.test(e.CASHFREE_ENV)) problems.push('CASHFREE_ENV must be PRODUCTION in production');
+} else if (e.PAYMENT_PROVIDER !== 'none' && !e.PAYMENT_WEBHOOK_SECRET) problems.push('PAYMENT_WEBHOOK_SECRET is required when PAYMENT_PROVIDER is configured');
 if (e.PLAGIARISM_PROVIDER !== 'none' && !e.PLAGIARISM_WEBHOOK_SECRET) problems.push('PLAGIARISM_WEBHOOK_SECRET is required when PLAGIARISM_PROVIDER is configured');
 if (e.NODE_ENV === 'production') {
   if (e.TRUST_PROXY.trim().toLowerCase() === 'true') problems.push('TRUST_PROXY must not be "true" in production; use a hop count or CIDR list');

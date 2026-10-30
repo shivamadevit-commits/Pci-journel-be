@@ -30,6 +30,7 @@ export const uploadRevision = async ({ user, params, body, files }: C<typeof v.r
 });
 
 export const payment = async ({ user, params }: C<undefined, undefined, typeof v.articleIdParam>) => ({ data: await articles.getMyArticlePayment(user.id, params.articleId) });
+export const verifyPayment = async ({ user, params }: C<undefined, undefined, typeof v.articleIdParam>) => ({ data: await payments.verifyPayment(user, params.articleId) });
 export const checkout = async ({ user, params }: C<undefined, undefined, typeof v.articleIdParam>) => ({ message: 'Checkout session created', data: await payments.startCheckout(user, params.articleId) });
 
 export const proofs = async ({ user, params }: C<undefined, undefined, typeof v.articleIdParam>) => ({ data: await production.authorListProofs(user.id, params.articleId) });
