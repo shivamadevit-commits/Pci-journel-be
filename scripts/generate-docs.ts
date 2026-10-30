@@ -12,8 +12,8 @@ import type { RouteMeta } from '../src/utils/route';
 
 type Js = { type?: string | string[]; properties?: Record<string, Js>; required?: string[]; enum?: unknown[]; format?: string; minimum?: number; maximum?: number; minLength?: number; maxLength?: number; minItems?: number; maxItems?: number; pattern?: string; items?: Js; anyOf?: Js[]; oneOf?: Js[]; default?: unknown };
 
-const ROLES = ['CHIEF_EDITOR_ADMIN', 'EDITOR', 'REVIEWER', 'AUTHOR', 'PRODUCTION'] as const;
-const ROLE_SHORT: Record<string, string> = { CHIEF_EDITOR_ADMIN: 'Admin', EDITOR: 'Editor', REVIEWER: 'Reviewer', AUTHOR: 'Author', PRODUCTION: 'Prod' };
+const ROLES = ['ADMIN', 'EDITOR', 'REVIEWER', 'AUTHOR', 'PRODUCTION'] as const;
+const ROLE_SHORT: Record<string, string> = { ADMIN: 'Admin', EDITOR: 'Editor', REVIEWER: 'Reviewer', AUTHOR: 'Author', PRODUCTION: 'Prod' };
 
 function js(schema: ZodType): Js {
   try {
@@ -101,7 +101,7 @@ function buildPermissionsMd(): string {
     '- **Author**: only their own articles, proofs, payment records and notifications. Never sees reviewer identities, assignments, internal notes, plagiarism data; sees reviewer comments only after a final decision and only those the Editor approved.',
     '- **Reviewer**: only their own assignments; the manuscript view contains no author names/emails/affiliations/title page; manuscript downloads use a neutral filename and have document metadata scrubbed; submitted reviews are locked (also enforced by database triggers).',
     '- **Editor**: articles assigned to them plus unassigned ones. Sees author and reviewer identities.',
-    '- **Chief Editor / Admin**: all articles, user and role management, configuration, audit logs, editor assignment.',
+    '- **Admin**: all articles, user and role management, configuration, audit logs, editor assignment.',
     '- **Production**: only accepted articles (Accepted – Production Pending onwards); no reviews, editorial decisions, plagiarism or APC data.',
     '- **Public**: published articles only (metadata, HTML, PDF).',
   ].join('\n');

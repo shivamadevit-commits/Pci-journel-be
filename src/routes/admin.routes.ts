@@ -4,15 +4,15 @@ import * as a from '../validators/article.validators';
 import * as e from '../validators/editorial.validators';
 import { publicRoute, route } from '../utils/route';
 
-const ADMIN = ['CHIEF_EDITOR_ADMIN'] as const;
-const EDITORIAL = ['CHIEF_EDITOR_ADMIN', 'EDITOR'] as const;
+const ADMIN = ['ADMIN'] as const;
+const EDITORIAL = ['ADMIN', 'EDITOR'] as const;
 const t = 'Administration';
 
 export const adminRoutes = [
   route({ method: 'get', path: '/admin/dashboard', tag: t, roles: [...ADMIN], summary: 'Admin dashboard counters', handler: c.dashboard }),
 
   route({ method: 'get', path: '/admin/users', tag: t, roles: [...ADMIN], summary: 'List / search users', query: v.listUsersQuery, handler: c.listUsers }),
-  route({ method: 'post', path: '/admin/users', tag: t, roles: [...ADMIN], summary: 'Create an Editor / Production / Chief Editor account (invitation e-mailed)', status: 201, body: v.createStaffBody, errors: [409], handler: c.createStaff }),
+  route({ method: 'post', path: '/admin/users', tag: t, roles: [...ADMIN], summary: 'Create an Editor / Production / Admin account (invitation e-mailed)', status: 201, body: v.createStaffBody, errors: [409], handler: c.createStaff }),
   route({ method: 'get', path: '/admin/users/:userId', tag: t, roles: [...ADMIN], summary: 'User detail', params: v.userIdParam, errors: [404], handler: c.getUser }),
   route({ method: 'put', path: '/admin/users/:userId/role', tag: t, roles: [...ADMIN], summary: 'Change a staff member’s role (sessions revoked)', params: v.userIdParam, body: v.changeRoleBody, errors: [403, 404, 409], handler: c.changeRole }),
   route({ method: 'put', path: '/admin/users/:userId/status', tag: t, roles: [...ADMIN], summary: 'Activate / deactivate / suspend an account', params: v.userIdParam, body: v.changeStatusBody, errors: [403, 404, 409], handler: c.changeStatus }),

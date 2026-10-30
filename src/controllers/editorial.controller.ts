@@ -29,6 +29,8 @@ export const screeningDecision = async ({ user, params, body }: C<typeof v.scree
 // plagiarism
 export const listPlagiarism = async ({ user, params }: C<undefined, undefined, A>) => ({ data: await plagiarism.listChecks(params.articleId, user) });
 export const initiatePlagiarism = async ({ user, params }: C<undefined, undefined, A>) => ({ status: 201, message: 'Plagiarism check initiated', data: await plagiarism.initiateCheck(params.articleId, user) });
+export const runPlagiarism = async ({ user, params }: C<undefined, undefined, A>) => ({ status: 202, message: 'Plagiarism check started', data: await plagiarism.runBuiltInCheck(params.articleId, user) });
+export const plagiarismReport = async ({ user, params }: C<undefined, undefined, typeof v.plagiarismParams>) => ({ data: await plagiarism.getCheckReport(params.articleId, params.checkId, user) });
 export const recordPlagiarism = async ({ user, params, body, files }: C<typeof v.manualPlagiarismBody, undefined, A>) => ({
   status: 201,
   message: 'Plagiarism result recorded',

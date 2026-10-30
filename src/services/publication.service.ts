@@ -73,7 +73,7 @@ export async function updateMetadata(articleId: string, input: MetadataInput, ac
   });
 }
 
-/** Publication authorisation rests with the Editor / Chief Editor (BR-016). The workflow service enforces every pre-condition. */
+/** Publication authorisation rests with the Editor / Admin (BR-016). The workflow service enforces every pre-condition. */
 export async function publish(articleId: string, publishedAt: Date | undefined, actor: Actor) {
   const when = publishedAt ?? new Date();
   if (when.getTime() > Date.now() + 5 * 60_000) throw new UnprocessableError('The publication date cannot be in the future', 'INVALID_PUBLICATION_DATE', [{ field: 'publishedAt', message: 'Cannot be in the future' }]);

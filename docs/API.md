@@ -219,7 +219,7 @@ Current authenticated user and role-specific profile
 
 Admin dashboard counters
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 401, 403, 500
 
@@ -227,7 +227,7 @@ Admin dashboard counters
 
 List / search users
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -238,16 +238,16 @@ List / search users
 | `page` | integer | no | min 1, max 100000, default `1` |
 | `pageSize` | integer | no | min 1, max 100, default `20` |
 | `search` | string | no | max length 100 |
-| `role` | `CHIEF_EDITOR_ADMIN` \| `EDITOR` \| `REVIEWER` \| `AUTHOR` \| `PRODUCTION` | no |  |
+| `role` | `ADMIN` \| `EDITOR` \| `REVIEWER` \| `AUTHOR` \| `PRODUCTION` | no |  |
 | `status` | `PENDING_VERIFICATION` \| `ACTIVE` \| `INACTIVE` \| `SUSPENDED` | no |  |
 | `sortBy` | `createdAt` \| `lastName` \| `email` \| `lastLoginAt` | no | default `"createdAt"` |
 | `sortOrder` | `asc` \| `desc` | no | default `"desc"` |
 
 ### `POST /api/v1/admin/users`
 
-Create an Editor / Production / Chief Editor account (invitation e-mailed)
+Create an Editor / Production / Admin account (invitation e-mailed)
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 201
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -258,14 +258,14 @@ Create an Editor / Production / Chief Editor account (invitation e-mailed)
 | `email` | string | yes | max length 254 |
 | `firstName` | string | yes | min length 1, max length 100 |
 | `lastName` | string | yes | min length 1, max length 100 |
-| `role` | `CHIEF_EDITOR_ADMIN` \| `EDITOR` \| `PRODUCTION` | yes |  |
+| `role` | `EDITOR` \| `PRODUCTION` | yes |  |
 | `designation` | string | no | max length 150 |
 
 ### `GET /api/v1/admin/users/:userId`
 
 User detail
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -279,7 +279,7 @@ User detail
 
 Change a staff member’s role (sessions revoked)
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -293,13 +293,13 @@ Change a staff member’s role (sessions revoked)
 
 | Field | Type | Required | Validation |
 |---|---|---|---|
-| `role` | `CHIEF_EDITOR_ADMIN` \| `EDITOR` \| `PRODUCTION` | yes |  |
+| `role` | `EDITOR` \| `PRODUCTION` | yes |  |
 
 ### `PUT /api/v1/admin/users/:userId/status`
 
 Activate / deactivate / suspend an account
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -319,7 +319,7 @@ Activate / deactivate / suspend an account
 
 Re-issue the account invitation
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -333,7 +333,7 @@ Re-issue the account invitation
 
 Active editors (for editor assignment)
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -344,7 +344,7 @@ Active editors (for editor assignment)
 | `page` | integer | no | min 1, max 100000, default `1` |
 | `pageSize` | integer | no | min 1, max 100, default `20` |
 | `search` | string | no | max length 100 |
-| `role` | `CHIEF_EDITOR_ADMIN` \| `EDITOR` \| `REVIEWER` \| `AUTHOR` \| `PRODUCTION` | no |  |
+| `role` | `ADMIN` \| `EDITOR` \| `REVIEWER` \| `AUTHOR` \| `PRODUCTION` | no |  |
 | `status` | `PENDING_VERIFICATION` \| `ACTIVE` \| `INACTIVE` \| `SUSPENDED` | no |  |
 | `sortBy` | `createdAt` \| `lastName` \| `email` \| `lastLoginAt` | no | default `"createdAt"` |
 | `sortOrder` | `asc` \| `desc` | no | default `"desc"` |
@@ -353,7 +353,7 @@ Active editors (for editor assignment)
 
 Assign an editor to an article
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 422, 500
 
@@ -373,7 +373,7 @@ Assign an editor to an article
 
 Portal configuration (word limit, APC rules, revision policy…)
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 401, 403, 500
 
@@ -381,7 +381,7 @@ Portal configuration (word limit, APC rules, revision policy…)
 
 Update portal configuration (audited)
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -390,6 +390,7 @@ Update portal configuration (audited)
 | Field | Type | Required | Validation |
 |---|---|---|---|
 | `wordLimit` | integer | no | min 1, max 200000 |
+| `paymentEnabled` | boolean | no |  |
 | `apcEnforcement` | `none` \| `flag` \| `block` | no |  |
 | `apcDefaultAmount` | number \| null | no |  |
 | `apcCurrency` | string \| null | no |  |
@@ -402,7 +403,7 @@ Update portal configuration (audited)
 
 Search the append-only audit trail
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -423,7 +424,7 @@ Search the append-only audit trail
 
 All subject areas including inactive
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 401, 403, 500
 
@@ -431,7 +432,7 @@ All subject areas including inactive
 
 Create a subject area
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 201
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -445,7 +446,7 @@ Create a subject area
 
 Rename / (de)activate a subject area
 
-- **Access:** CHIEF_EDITOR_ADMIN
+- **Access:** ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -491,8 +492,6 @@ Update own profile (fields depend on role)
 | `affiliation` | string | no | max length 250 |
 | `country` | string | no | max length 100 |
 | `phone` | string | no | max length 30, pattern `^[+\d][\d\s().-]{4,29}$` |
-| `orcid` | string | no | pattern `^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$` |
-| `bio` | string | no | max length 2000 |
 | `designation` | string | no | max length 150 |
 | `institution` | string | no | max length 250 |
 | `qualificationNotes` | string | no | max length 2000 |
@@ -572,8 +571,6 @@ Update author profile
 | `affiliation` | string | no | max length 250 |
 | `country` | string | no | max length 100 |
 | `phone` | string | no | max length 30, pattern `^[+\d][\d\s().-]{4,29}$` |
-| `orcid` | string | no | pattern `^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$` |
-| `bio` | string | no | max length 2000 |
 | `designation` | string | no | max length 150 |
 | `institution` | string | no | max length 250 |
 | `qualificationNotes` | string | no | max length 2000 |
@@ -667,6 +664,20 @@ APC / payment status
 |---|---|---|---|
 | `articleId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
 
+### `POST /api/v1/author/articles/:articleId/payment/verify`
+
+Reconcile APC payment status with the gateway after returning from checkout
+
+- **Access:** AUTHOR
+- **Success:** 200
+- **Errors:** 400, 401, 403, 500, 503
+
+**Path parameters**
+
+| Field | Type | Required | Validation |
+|---|---|---|---|
+| `articleId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
+
 ### `POST /api/v1/author/articles/:articleId/payment/checkout`
 
 Start online APC payment through the configured gateway
@@ -744,7 +755,7 @@ Return corrections on a proof (MAJOR items are routed to the Editor)
 
 Editorial dashboard
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 401, 403, 500
 
@@ -752,7 +763,7 @@ Editorial dashboard
 
 Article / screening queues (filter by status, search, APC, editor…)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -777,7 +788,7 @@ Article / screening queues (filter by status, search, APC, editor…)
 
 Full article record incl. author identity, reviewers and reports
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -791,7 +802,7 @@ Full article record incl. author identity, reviewers and reports
 
 Status history with actors
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -805,7 +816,7 @@ Status history with actors
 
 Begin initial screening (Submitted → Under Editorial Screening)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -819,7 +830,7 @@ Begin initial screening (Submitted → Under Editorial Screening)
 
 Screening decision: PROCEED (→ Plagiarism Check) or REJECT (closed; no resubmission)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -841,7 +852,7 @@ Screening decision: PROCEED (→ Plagiarism Check) or REJECT (closed; no resubmi
 
 Plagiarism checks for the article
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -855,7 +866,7 @@ Plagiarism checks for the article
 
 Send the manuscript to the configured plagiarism provider
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 201
 - **Errors:** 400, 401, 403, 409, 500, 503
 
@@ -865,11 +876,42 @@ Send the manuscript to the configured plagiarism provider
 |---|---|---|---|
 | `articleId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
 
+### `POST /api/v1/editorial/articles/:articleId/plagiarism/run`
+
+Run the built-in plagiarism check (internal database + web search); runs in the background
+
+Returns the IN_PROGRESS check immediately. Poll `GET …/plagiarism`; when COMPLETED, fetch the detailed report from `GET …/plagiarism/:checkId/report`.
+
+- **Access:** ADMIN, EDITOR
+- **Success:** 202
+- **Errors:** 400, 401, 403, 409, 500
+
+**Path parameters**
+
+| Field | Type | Required | Validation |
+|---|---|---|---|
+| `articleId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
+
+### `GET /api/v1/editorial/articles/:articleId/plagiarism/:checkId/report`
+
+Detailed plagiarism report (scores, matched sources and snippets)
+
+- **Access:** ADMIN, EDITOR
+- **Success:** 200
+- **Errors:** 400, 401, 403, 404, 500
+
+**Path parameters**
+
+| Field | Type | Required | Validation |
+|---|---|---|---|
+| `articleId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
+| `checkId` | string (uuid) | yes | pattern `^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}\|00000000-0000-0000-0000-000000000000\|ffffffff-ffff-ffff-ffff-ffffffffffff)$` |
+
 ### `POST /api/v1/editorial/articles/:articleId/plagiarism/record`
 
 Record a plagiarism result manually (optional report file in `report`)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 201
 - **Errors:** 400, 401, 403, 409, 413, 500
 
@@ -894,7 +936,7 @@ Record a plagiarism result manually (optional report file in `report`)
 
 Record the Editor’s verdict on a completed provider check
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -916,7 +958,7 @@ Record the Editor’s verdict on a completed provider check
 
 CLEAR the article for reviewer assignment, or REJECT it
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -938,7 +980,7 @@ CLEAR the article for reviewer assignment, or REJECT it
 
 APC payment record
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -952,7 +994,7 @@ APC payment record
 
 Record / change APC status manually (validated transitions)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 422, 500
 
@@ -976,7 +1018,7 @@ Record / change APC status manually (validated transitions)
 
 Approved reviewer pool with subject areas and qualifications
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -994,7 +1036,7 @@ Approved reviewer pool with subject areas and qualifications
 
 Reviewer profile / eligibility
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -1008,7 +1050,7 @@ Reviewer profile / eligibility
 
 Update reviewer (active flag, subject areas, internal notes)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -1030,7 +1072,7 @@ Update reviewer (active flag, subject areas, internal notes)
 
 Suitability / conflict check before assigning a reviewer
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -1045,7 +1087,7 @@ Suitability / conflict check before assigning a reviewer
 
 Reviewer applications
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1062,7 +1104,7 @@ Reviewer applications
 
 Application detail
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -1076,7 +1118,7 @@ Application detail
 
 Approve: creates the reviewer account, issues a unique Reviewer ID and e-mails an invitation
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1096,7 +1138,7 @@ Approve: creates the reviewer account, issues a unique Reviewer ID and e-mails a
 
 Reject an application
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1116,7 +1158,7 @@ Reject an application
 
 Manually assign exactly two reviewers (Ready for Reviewer Assignment → Under Review)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 201
 - **Errors:** 400, 401, 403, 409, 422, 500
 
@@ -1137,7 +1179,7 @@ Manually assign exactly two reviewers (Ready for Reviewer Assignment → Under R
 
 Replace a declined / pending reviewer
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1159,7 +1201,7 @@ Replace a declined / pending reviewer
 
 Send a review reminder (max one per 24h)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1174,7 +1216,7 @@ Send a review reminder (max one per 24h)
 
 Both reviewer reports (submitted only) with reviewer identities
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1190,7 +1232,7 @@ Select / edit / approve reviewer comments for disclosure to the author
 
 Comments of section CONFIDENTIAL_TO_EDITOR can never be approved. Only approved comments (using `editedBody` if provided) are ever shown to the author.
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 422, 500
 
@@ -1210,7 +1252,7 @@ Comments of section CONFIDENTIAL_TO_EDITOR can never be approved. Only approved 
 
 Final decision: ACCEPT (→ Accepted – Production Pending), REJECT, or REQUEST_REVISION (if enabled)
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 500
 
@@ -1232,7 +1274,7 @@ Final decision: ACCEPT (→ Accepted – Production Pending), REJECT, or REQUEST
 
 Major content-change requests awaiting / after Editor decision
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1248,7 +1290,7 @@ Major content-change requests awaiting / after Editor decision
 
 Approve or reject a major content change
 
-- **Access:** CHIEF_EDITOR_ADMIN, EDITOR
+- **Access:** ADMIN, EDITOR
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1438,7 +1480,7 @@ Production dashboard
 
 Accepted-articles production queue
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1456,7 +1498,7 @@ Accepted-articles production queue
 
 Production view of an accepted article (no reviews, decisions, plagiarism or APC data)
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 500
 
@@ -1470,7 +1512,7 @@ Production view of an accepted article (no reviews, decisions, plagiarism or APC
 
 Assign the production task (production users may only assign themselves)
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 422, 500
 
@@ -1526,7 +1568,7 @@ Upload a formatted proof (multipart: file `proof`; sendToAuthor defaults to true
 
 Proof versions
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1555,7 +1597,7 @@ Send a previously uploaded proof to the author
 
 Corrections requested by the author
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1646,7 +1688,7 @@ Final production complete → publication handoff to the Editor
 
 Publication record, metadata and readiness checklist
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 500
 
@@ -1660,7 +1702,7 @@ Publication record, metadata and readiness checklist
 
 Set publication metadata (DOI, volume, issue, pages, licence…)
 
-- **Access:** PRODUCTION, EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** PRODUCTION, EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 404, 409, 500
 
@@ -1687,7 +1729,7 @@ Set publication metadata (DOI, volume, issue, pages, licence…)
 
 Authorise publication (Final Production → Published); requires final HTML + PDF, completed handoff and required metadata
 
-- **Access:** EDITOR, CHIEF_EDITOR_ADMIN
+- **Access:** EDITOR, ADMIN
 - **Success:** 200
 - **Errors:** 400, 401, 403, 409, 422, 500
 
@@ -1755,6 +1797,14 @@ Public download of the published HTML (`html`) or PDF (`pdf`)
 | `kind` | `html` \| `pdf` | yes |  |
 
 ## Files
+
+### `GET /api/v1/config/features`
+
+Portal feature flags (e.g. whether payment is enabled)
+
+- **Access:** Any authenticated role
+- **Success:** 200
+- **Errors:** 401, 403, 500
 
 ### `GET /api/v1/files/:fileId/download`
 

@@ -14,7 +14,7 @@ datasource db {
 // ───────────────────────────── Enums ─────────────────────────────
 
 enum Role {
-  CHIEF_EDITOR_ADMIN
+  ADMIN
   EDITOR
   REVIEWER
   AUTHOR
@@ -504,6 +504,8 @@ model ManuscriptVersion {
   titlePageFileId String?     @unique @db.Uuid
   wordCount       Int
   changeNote      String?
+  /// Plain text extracted lazily by the plagiarism engine; used as the internal comparison corpus.
+  extractedText   String?
   createdById     String      @db.Uuid
   createdAt       DateTime    @default(now()) @db.Timestamptz(6)
 
@@ -621,6 +623,8 @@ model PlagiarismCheck {
   reportFileId      String?            @unique @db.Uuid
   notes             String?
   errorMessage      String?
+  /// Detailed report from the built-in engine (internalScore, webScore, matchedSources).
+  report            Json?
   initiatedById     String             @db.Uuid
   completedAt       DateTime?          @db.Timestamptz(6)
   createdAt         DateTime           @default(now()) @db.Timestamptz(6)

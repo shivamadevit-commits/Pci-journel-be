@@ -3,7 +3,7 @@ import * as a from '../validators/article.validators';
 import * as v from '../validators/editorial.validators';
 import { route } from '../utils/route';
 
-const ED = ['CHIEF_EDITOR_ADMIN', 'EDITOR'] as const;
+const ED = ['ADMIN', 'EDITOR'] as const;
 const tag = 'Editorial';
 const reportUpload = { fields: [{ name: 'report', kind: 'report' as const }] };
 
@@ -22,6 +22,13 @@ export const editorialRoutes = [
 
   route({ method: 'get', path: '/editorial/articles/:articleId/plagiarism', tag, roles: [...ED], summary: 'Plagiarism checks for the article', params: a.articleIdParam, handler: c.listPlagiarism }),
   route({ method: 'post', path: '/editorial/articles/:articleId/plagiarism/initiate', tag, roles: [...ED], status: 201, summary: 'Send the manuscript to the configured plagiarism provider', params: a.articleIdParam, errors: [409, 503], handler: c.initiatePlagiarism }),
+  route({
+    method: 'post', path: '/editorial/articles/:articleId/plagiarism/run', tag, roles: [...ED], status: 202,
+    summary: 'Run the built-in plagiarism check (internal database + web search); runs in the background',
+    description: 'Returns the IN_PROGRESS check immediately. Poll `GET …/plagiarism`; when COMPLETED, fetch the detailed report from `GET …/plagiarism/:checkId/report`.',
+    params: a.articleIdParam, errors: [409], handler: c.runPlagiarism,
+  }),
+  route({ method: 'get', path: '/editorial/articles/:articleId/plagiarism/:checkId/report', tag, roles: [...ED], summary: 'Detailed plagiarism report (scores, matched sources and snippets)', params: v.plagiarismParams, errors: [404], handler: c.plagiarismReport }),
   route({ method: 'post', path: '/editorial/articles/:articleId/plagiarism/record', tag, roles: [...ED], status: 201, summary: 'Record a plagiarism result manually (optional report file in `report`)', params: a.articleIdParam, body: v.manualPlagiarismBody, upload: reportUpload, errors: [409, 413], handler: c.recordPlagiarism }),
   route({ method: 'put', path: '/editorial/articles/:articleId/plagiarism/:checkId/verdict', tag, roles: [...ED], summary: 'Record the Editor’s verdict on a completed provider check', params: v.plagiarismParams, body: v.verdictBody, errors: [404, 409], handler: c.setPlagiarismVerdict }),
   route({ method: 'post', path: '/editorial/articles/:articleId/plagiarism/clearance', tag, roles: [...ED], summary: 'CLEAR the article for reviewer assignment, or REJECT it', params: a.articleIdParam, body: v.clearanceBody, errors: [409], handler: c.plagiarismClearance }),

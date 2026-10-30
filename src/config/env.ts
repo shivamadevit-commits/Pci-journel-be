@@ -116,6 +116,13 @@ const schema = z.object({
   PLAGIARISM_API_BASE_URL: optionalString,
   PLAGIARISM_API_KEY: optionalString,
   PLAGIARISM_WEBHOOK_SECRET: optionalString,
+  // Built-in plagiarism engine (internal DB comparison + web search). WEB_SEARCH_PROVIDER=none skips the web layer.
+  WEB_SEARCH_PROVIDER: z.string().default('none'),
+  BRAVE_SEARCH_API_KEY: optionalString,
+  PLAGIARISM_INTERNAL_CORPUS_LIMIT: int(2000, 1),
+  PLAGIARISM_WEB_MAX_QUERIES: int(8, 1),
+  PLAGIARISM_WEB_MAX_PAGES: int(10, 1),
+  PLAGIARISM_FETCH_TIMEOUT_MS: int(10000, 1000),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -143,6 +150,7 @@ if (e.PAYMENT_PROVIDER === 'cashfree') {
   if (e.NODE_ENV === 'production' && !/^PROD(UCTION)?$/i.test(e.CASHFREE_ENV)) problems.push('CASHFREE_ENV must be PRODUCTION in production');
 } else if (e.PAYMENT_PROVIDER !== 'none' && !e.PAYMENT_WEBHOOK_SECRET) problems.push('PAYMENT_WEBHOOK_SECRET is required when PAYMENT_PROVIDER is configured');
 if (e.PLAGIARISM_PROVIDER !== 'none' && !e.PLAGIARISM_WEBHOOK_SECRET) problems.push('PLAGIARISM_WEBHOOK_SECRET is required when PLAGIARISM_PROVIDER is configured');
+if (e.WEB_SEARCH_PROVIDER === 'brave' && !e.BRAVE_SEARCH_API_KEY) problems.push('BRAVE_SEARCH_API_KEY is required when WEB_SEARCH_PROVIDER=brave');
 if (e.NODE_ENV === 'production') {
   if (e.TRUST_PROXY.trim().toLowerCase() === 'true') problems.push('TRUST_PROXY must not be "true" in production; use a hop count or CIDR list');
   if (/localhost|127\.0\.0\.1/.test(e.FRONTEND_URL)) problems.push('FRONTEND_URL must not point at localhost in production');

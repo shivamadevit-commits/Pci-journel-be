@@ -53,11 +53,11 @@ export async function notifyMany(db: Db, userIds: string[], input: Omit<NotifyIn
   for (const userId of new Set(userIds)) await notify(db, { ...input, userId });
 }
 
-/** Editorial recipients for an article: the assigned editor, otherwise every active editor and chief editor. */
+/** Editorial recipients for an article: the assigned editor, otherwise every active editor and admin. */
 export async function editorialRecipients(db: Db, article: { editorId: string | null }): Promise<string[]> {
   if (article.editorId) return [article.editorId];
   const staff = await db.user.findMany({
-    where: { role: { in: [Role.EDITOR, Role.CHIEF_EDITOR_ADMIN] }, status: 'ACTIVE' },
+    where: { role: { in: [Role.EDITOR, Role.ADMIN] }, status: 'ACTIVE' },
     select: { id: true },
   });
   return staff.map((s) => s.id);

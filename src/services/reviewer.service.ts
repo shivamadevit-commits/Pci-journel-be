@@ -64,7 +64,7 @@ export async function applyAsReviewer(input: ReviewerApplicationInput, files: Up
         },
       });
       await recordAudit(tx, { action: AuditAction.REVIEWER_APPLICATION_SUBMITTED, entityType: 'ReviewerApplication', entityId: app.id });
-      const editors = await tx.user.findMany({ where: { role: { in: [Role.EDITOR, Role.CHIEF_EDITOR_ADMIN] }, status: 'ACTIVE' }, select: { id: true } });
+      const editors = await tx.user.findMany({ where: { role: { in: [Role.EDITOR, Role.ADMIN] }, status: 'ACTIVE' }, select: { id: true } });
       await notifyMany(tx, editors.map((e) => e.id), {
         type: 'reviewer.application_submitted',
         title: 'New reviewer application',

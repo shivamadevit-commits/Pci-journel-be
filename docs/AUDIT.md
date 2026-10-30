@@ -19,7 +19,7 @@ In addition `ArticleStatusHistory` keeps one row per workflow transition (from, 
 
 - Written with the *same transaction client* as the change they describe (rolled back together).
 - **Append-only at the database level**: triggers `AuditLog_no_update_delete`, `AuditLog_no_truncate` and `ArticleStatusHistory_no_update_delete` raise on UPDATE/DELETE/TRUNCATE. The API exposes no write endpoint for audit data. Foreign keys to users are `RESTRICT` and users are deactivated, never deleted.
-- Retrieval: `GET /admin/audit-logs` (Chief Editor/Admin only) with filters `actorId, action (prefix), entityType, entityId, from, to` + pagination. Editors get article-level history via `GET /editorial/articles/:id/history`.
+- Retrieval: `GET /admin/audit-logs` (Admin only) with filters `actorId, action (prefix), entityType, entityId, from, to` + pagination. Editors get article-level history via `GET /editorial/articles/:id/history`.
 
 ## Event catalogue
 

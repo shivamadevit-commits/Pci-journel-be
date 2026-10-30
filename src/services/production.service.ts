@@ -23,7 +23,7 @@ async function loadProductionArticle(articleId: string, user: Actor) {
     if (!PRODUCTION_STATUSES.includes(article.status)) throw new NotFoundError('Article not found');
   } else if (user.role === Role.EDITOR) {
     if (article.editorId && article.editorId !== user.id) throw new NotFoundError('Article not found');
-  } else if (user.role !== Role.CHIEF_EDITOR_ADMIN) {
+  } else if (user.role !== Role.ADMIN) {
     throw new ForbiddenError();
   }
   return article;
@@ -315,7 +315,7 @@ export async function listMajorChanges(user: Actor, q: { page: number; pageSize:
   const where: Prisma.CorrectionWhereInput = {
     type: 'MAJOR',
     status: q.pending === false ? { not: 'ESCALATED' } : 'ESCALATED',
-    article: user.role === Role.CHIEF_EDITOR_ADMIN ? {} : { OR: [{ editorId: null }, { editorId: user.id }] },
+    article: user.role === Role.ADMIN ? {} : { OR: [{ editorId: null }, { editorId: user.id }] },
   };
   const [items, total] = await Promise.all([
     prisma.correction.findMany({

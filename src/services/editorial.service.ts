@@ -12,7 +12,7 @@ import { getReviewsForEditor } from './review.service';
 import { transitionArticle } from './workflow.service';
 
 /** Row-level visibility filter applied to every editorial query: editors only see their own and unassigned articles. */
-const scope = (user: Actor): Prisma.ArticleWhereInput => (user.role === Role.CHIEF_EDITOR_ADMIN ? {} : { OR: [{ editorId: null }, { editorId: user.id }] });
+const scope = (user: Actor): Prisma.ArticleWhereInput => (user.role === Role.ADMIN ? {} : { OR: [{ editorId: null }, { editorId: user.id }] });
 
 const listSelect = {
   id: true,

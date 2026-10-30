@@ -15,6 +15,7 @@ import { createAsset, stageFile, withStaged } from './files.service';
 import { notify } from './notification.service';
 import { transitionArticle } from './workflow.service';
 import { links } from '../templates/links';
+import { checkPlagiarism } from './plagiarism';
 
 const checkView = {
   id: true, status: true, source: true, provider: true, providerReference: true, similarityScore: true, verdict: true,
@@ -64,6 +65,57 @@ export async function initiateCheck(articleId: string, actor: Actor) {
     await prisma.plagiarismCheck.update({ where: { id: check.id }, data: { status: 'FAILED', errorMessage: msg } });
     throw new ServiceUnavailableError('The plagiarism provider could not accept the manuscript. You can retry or record the result manually.', 'PLAGIARISM_PROVIDER_ERROR');
   }
+}
+
+const BUILT_IN = 'built-in';
+
+/**
+ * Runs the built-in engine (internal DB comparison + web search) on the current manuscript. The check is created
+ * IN_PROGRESS and the response returns immediately; the engine finishes in the background and stores the report on the
+ * check (poll `listChecks`, fetch the report with `getCheckReport`). Failures are stored as FAILED — never as a result.
+ */
+export async function runBuiltInCheck(articleId: string, actor: Actor) {
+  const article = await loadArticleForEditorial(articleId, actor);
+  requirePlagiarismStage(article.status);
+  const version = await currentVersion(articleId);
+
+  // A check older than this is assumed lost (e.g. the server restarted mid-run) and no longer blocks a new one.
+  const staleBefore = new Date(Date.now() - 15 * 60_000);
+  const open = await prisma.plagiarismCheck.findFirst({ where: { articleId, versionId: version.id, status: { in: ['PENDING', 'IN_PROGRESS'] }, createdAt: { gt: staleBefore } } });
+  if (open) throw new ConflictError('A plagiarism check is already in progress for this manuscript version', 'CHECK_IN_PROGRESS');
+
+  const check = await transact(async (tx) => {
+    const c = await tx.plagiarismCheck.create({
+      data: { articleId, versionId: version.id, status: 'IN_PROGRESS', source: 'API', provider: BUILT_IN, initiatedById: actor.id },
+      select: checkView,
+    });
+    await recordAudit(tx, { action: AuditAction.PLAGIARISM_INITIATED, entityType: 'PlagiarismCheck', entityId: c.id, actor, metadata: { articleId, provider: BUILT_IN } });
+    return c;
+  });
+
+  void checkPlagiarism({ versionId: version.id })
+    .then((report) =>
+      prisma.plagiarismCheck.update({
+        where: { id: check.id },
+        data: { status: 'COMPLETED', similarityScore: report.totalPlagiarismScore, report: report as unknown as Prisma.InputJsonValue, completedAt: new Date() },
+      }),
+    )
+    .catch(async (err: Error) => {
+      logger.error({ err: err.message, checkId: check.id }, 'built-in plagiarism check failed');
+      await prisma.plagiarismCheck
+        .update({ where: { id: check.id }, data: { status: 'FAILED', errorMessage: err.message.slice(0, 300), completedAt: new Date() } })
+        .catch((e: Error) => logger.error({ err: e.message, checkId: check.id }, 'could not record plagiarism failure'));
+    });
+
+  return check;
+}
+
+/** The detailed report (scores + matched sources) of a completed built-in check. */
+export async function getCheckReport(articleId: string, checkId: string, actor: Actor) {
+  await loadArticleForEditorial(articleId, actor);
+  const check = await prisma.plagiarismCheck.findFirst({ where: { id: checkId, articleId }, select: { ...checkView, report: true } });
+  if (!check) throw new NotFoundError('Plagiarism check not found');
+  return check;
 }
 
 export interface ManualCheckInput {

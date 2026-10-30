@@ -1309,7 +1309,7 @@
         ],
         "summary": "Admin dashboard counters",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -1383,7 +1383,7 @@
         ],
         "summary": "List / search users",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -1429,7 +1429,7 @@
             "schema": {
               "type": "string",
               "enum": [
-                "CHIEF_EDITOR_ADMIN",
+                "ADMIN",
                 "EDITOR",
                 "REVIEWER",
                 "AUTHOR",
@@ -1552,9 +1552,9 @@
         "tags": [
           "Administration"
         ],
-        "summary": "Create an Editor / Production / Chief Editor account (invitation e-mailed)",
+        "summary": "Create an Editor / Production / Admin account (invitation e-mailed)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -1587,7 +1587,6 @@
                   "role": {
                     "type": "string",
                     "enum": [
-                      "CHIEF_EDITOR_ADMIN",
                       "EDITOR",
                       "PRODUCTION"
                     ]
@@ -1693,7 +1692,7 @@
         ],
         "summary": "User detail",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -1798,7 +1797,7 @@
         ],
         "summary": "Change a staff member’s role (sessions revoked)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -1828,7 +1827,6 @@
                   "role": {
                     "type": "string",
                     "enum": [
-                      "CHIEF_EDITOR_ADMIN",
                       "EDITOR",
                       "PRODUCTION"
                     ]
@@ -1937,7 +1935,7 @@
         ],
         "summary": "Activate / deactivate / suspend an account",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2076,7 +2074,7 @@
         ],
         "summary": "Re-issue the account invitation",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2191,7 +2189,7 @@
         ],
         "summary": "Active editors (for editor assignment)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2237,7 +2235,7 @@
             "schema": {
               "type": "string",
               "enum": [
-                "CHIEF_EDITOR_ADMIN",
+                "ADMIN",
                 "EDITOR",
                 "REVIEWER",
                 "AUTHOR",
@@ -2364,7 +2362,7 @@
         ],
         "summary": "Assign an editor to an article",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2510,7 +2508,7 @@
         ],
         "summary": "Portal configuration (word limit, APC rules, revision policy…)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2582,7 +2580,7 @@
         ],
         "summary": "Update portal configuration (audited)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2602,6 +2600,9 @@
                     "type": "integer",
                     "minimum": 1,
                     "maximum": 200000
+                  },
+                  "paymentEnabled": {
+                    "type": "boolean"
                   },
                   "apcEnforcement": {
                     "type": "string",
@@ -2752,7 +2753,7 @@
         ],
         "summary": "Search the append-only audit trail",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2910,7 +2911,7 @@
         ],
         "summary": "All subject areas including inactive",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -2982,7 +2983,7 @@
         ],
         "summary": "Create a subject area",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -3097,7 +3098,7 @@
         ],
         "summary": "Rename / (de)activate a subject area",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -3310,14 +3311,6 @@
                     "type": "string",
                     "maxLength": 30,
                     "pattern": "^[+\\d][\\d\\s().-]{4,29}$"
-                  },
-                  "orcid": {
-                    "type": "string",
-                    "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$"
-                  },
-                  "bio": {
-                    "type": "string",
-                    "maxLength": 2000
                   },
                   "designation": {
                     "type": "string",
@@ -3894,14 +3887,6 @@
                     "type": "string",
                     "maxLength": 30,
                     "pattern": "^[+\\d][\\d\\s().-]{4,29}$"
-                  },
-                  "orcid": {
-                    "type": "string",
-                    "pattern": "^\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dX]$"
-                  },
-                  "bio": {
-                    "type": "string",
-                    "maxLength": 2000
                   },
                   "designation": {
                     "type": "string",
@@ -4644,6 +4629,111 @@
         }
       }
     },
+    "/api/v1/author/articles/{articleId}/payment/verify": {
+      "post": {
+        "tags": [
+          "Author portal"
+        ],
+        "summary": "Reconcile APC payment status with the gateway after returning from checkout",
+        "x-roles": [
+          "AUTHOR"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {},
+                    "meta": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (field-level `errors`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated / invalid credentials or token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated but not permitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Dependency unavailable / provider not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/author/articles/{articleId}/payment/checkout": {
       "post": {
         "tags": [
@@ -5158,7 +5248,7 @@
         ],
         "summary": "Editorial dashboard",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5233,7 +5323,7 @@
         ],
         "summary": "Article / screening queues (filter by status, search, APC, editor…)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5453,7 +5543,7 @@
         ],
         "summary": "Full article record incl. author identity, reviewers and reports",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5559,7 +5649,7 @@
         ],
         "summary": "Status history with actors",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5655,7 +5745,7 @@
         ],
         "summary": "Begin initial screening (Submitted → Under Editorial Screening)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5761,7 +5851,7 @@
         ],
         "summary": "Screening decision: PROCEED (→ Plagiarism Check) or REJECT (closed; no resubmission)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5898,7 +5988,7 @@
         ],
         "summary": "Plagiarism checks for the article",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -5994,7 +6084,7 @@
         ],
         "summary": "Send the manuscript to the configured plagiarism provider",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6103,6 +6193,229 @@
         }
       }
     },
+    "/api/v1/editorial/articles/{articleId}/plagiarism/run": {
+      "post": {
+        "tags": [
+          "Editorial"
+        ],
+        "summary": "Run the built-in plagiarism check (internal database + web search); runs in the background",
+        "description": "Returns the IN_PROGRESS check immediately. Poll `GET …/plagiarism`; when COMPLETED, fetch the detailed report from `GET …/plagiarism/:checkId/report`.",
+        "x-roles": [
+          "ADMIN",
+          "EDITOR"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {},
+                    "meta": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (field-level `errors`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated / invalid credentials or token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated but not permitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict or invalid workflow state transition",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/editorial/articles/{articleId}/plagiarism/{checkId}/report": {
+      "get": {
+        "tags": [
+          "Editorial"
+        ],
+        "summary": "Detailed plagiarism report (scores, matched sources and snippets)",
+        "x-roles": [
+          "ADMIN",
+          "EDITOR"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          {
+            "name": "checkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {},
+                    "meta": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (field-level `errors`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated / invalid credentials or token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated but not permitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found (also returned when the resource exists but is not visible to the caller)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/editorial/articles/{articleId}/plagiarism/record": {
       "post": {
         "tags": [
@@ -6110,7 +6423,7 @@
         ],
         "summary": "Record a plagiarism result manually (optional report file in `report`)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6272,7 +6585,7 @@
         ],
         "summary": "Record the Editor’s verdict on a completed provider check",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6425,7 +6738,7 @@
         ],
         "summary": "CLEAR the article for reviewer assignment, or REJECT it",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6562,7 +6875,7 @@
         ],
         "summary": "APC payment record",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6656,7 +6969,7 @@
         ],
         "summary": "Record / change APC status manually (validated transitions)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6816,7 +7129,7 @@
         ],
         "summary": "Approved reviewer pool with subject areas and qualifications",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -6955,7 +7268,7 @@
         ],
         "summary": "Reviewer profile / eligibility",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7059,7 +7372,7 @@
         ],
         "summary": "Update reviewer (active flag, subject areas, internal notes)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7195,7 +7508,7 @@
         ],
         "summary": "Suitability / conflict check before assigning a reviewer",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7311,7 +7624,7 @@
         ],
         "summary": "Reviewer applications",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7441,7 +7754,7 @@
         ],
         "summary": "Application detail",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7547,7 +7860,7 @@
         ],
         "summary": "Approve: creates the reviewer account, issues a unique Reviewer ID and e-mails an invitation",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7680,7 +7993,7 @@
         ],
         "summary": "Reject an application",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7813,7 +8126,7 @@
         ],
         "summary": "Manually assign exactly two reviewers (Ready for Reviewer Assignment → Under Review)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -7956,7 +8269,7 @@
         ],
         "summary": "Replace a declined / pending reviewer",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8107,7 +8420,7 @@
         ],
         "summary": "Send a review reminder (max one per 24h)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8233,7 +8546,7 @@
         ],
         "summary": "Both reviewer reports (submitted only) with reviewer identities",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8330,7 +8643,7 @@
         "summary": "Select / edit / approve reviewer comments for disclosure to the author",
         "description": "Comments of section CONFIDENTIAL_TO_EDITOR can never be approved. Only approved comments (using `editedBody` if provided) are ever shown to the author.",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8506,7 +8819,7 @@
         ],
         "summary": "Final decision: ACCEPT (→ Accepted – Production Pending), REJECT, or REQUEST_REVISION (if enabled)",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8644,7 +8957,7 @@
         ],
         "summary": "Major content-change requests awaiting / after Editor decision",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -8764,7 +9077,7 @@
         ],
         "summary": "Approve or reject a major content change",
         "x-roles": [
-          "CHIEF_EDITOR_ADMIN",
+          "ADMIN",
           "EDITOR"
         ],
         "security": [
@@ -10258,7 +10571,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -10396,7 +10709,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -10503,7 +10816,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -10885,7 +11198,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -11107,7 +11420,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -11721,7 +12034,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -11818,7 +12131,7 @@
         "x-roles": [
           "PRODUCTION",
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -12049,7 +12362,7 @@
         "summary": "Authorise publication (Final Production → Published); requires final HTML + PDF, completed handoff and required metadata",
         "x-roles": [
           "EDITOR",
-          "CHIEF_EDITOR_ADMIN"
+          "ADMIN"
         ],
         "security": [
           {
@@ -12366,6 +12679,80 @@
           },
           "404": {
             "description": "Not found (also returned when the resource exists but is not visible to the caller)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/config/features": {
+      "get": {
+        "tags": [
+          "Files"
+        ],
+        "summary": "Portal feature flags (e.g. whether payment is enabled)",
+        "x-roles": [
+          "any authenticated role"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {},
+                    "meta": {
+                      "nullable": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated / invalid credentials or token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated but not permitted",
             "content": {
               "application/json": {
                 "schema": {

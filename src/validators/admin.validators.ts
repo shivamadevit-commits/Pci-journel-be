@@ -17,11 +17,11 @@ export const createStaffBody = z.object({
   email,
   firstName: name(),
   lastName: name(),
-  role: z.enum(['CHIEF_EDITOR_ADMIN', 'EDITOR', 'PRODUCTION']),
+  role: z.enum(['EDITOR', 'PRODUCTION']),
   designation: optionalText(150),
 });
 
-export const changeRoleBody = z.object({ role: z.enum(['CHIEF_EDITOR_ADMIN', 'EDITOR', 'PRODUCTION']) });
+export const changeRoleBody = z.object({ role: z.enum(['EDITOR', 'PRODUCTION']) });
 export const changeStatusBody = z.object({ status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']) });
 
 export const updateProfileBody = z

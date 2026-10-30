@@ -45,7 +45,7 @@ npm install
 cp .env.example .env                 # then edit DATABASE_URL, JWT_ACCESS_SECRET, SMTP_* …
 npm run prisma:generate              # generate Prisma Client
 npm run prisma:migrate:dev           # dev only: applies prisma/migrations/* to your local DB
-npm run seed                         # subject areas (BRD §5) + first Chief Editor/Admin (SEED_ADMIN_*)
+npm run seed                         # subject areas (BRD §5) + first Admin (SEED_ADMIN_*)
 npm run dev                          # http://localhost:4000  (docs: /api/docs)
 ```
 
@@ -73,7 +73,7 @@ Never run `prisma migrate reset` or `db push --force-reset` against a database t
 
 ## Configuration
 
-All configuration comes from environment variables (see `.env.example`, validated at start-up — the process exits with a clear message if anything required is missing or unsafe, e.g. `STORAGE_DRIVER=local` or a localhost `FRONTEND_URL` in production). Journal rules (word limit, APC enforcement, revision policy, review due days, required publication metadata, reviewer eligibility years) can additionally be changed at runtime by the Chief Editor through `PUT /api/v1/admin/config` (audited); `.env` provides the defaults.
+All configuration comes from environment variables (see `.env.example`, validated at start-up — the process exits with a clear message if anything required is missing or unsafe, e.g. `STORAGE_DRIVER=local` or a localhost `FRONTEND_URL` in production). Journal rules (word limit, APC enforcement, revision policy, review due days, required publication metadata, reviewer eligibility years) can additionally be changed at runtime by the Admin through `PUT /api/v1/admin/config` (audited); `.env` provides the defaults.
 
 ## Security summary
 

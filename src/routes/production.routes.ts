@@ -4,8 +4,8 @@ import * as v from '../validators/production.validators';
 import { publicRoute, route } from '../utils/route';
 
 const PROD = ['PRODUCTION'] as const;
-const VIEW = ['PRODUCTION', 'EDITOR', 'CHIEF_EDITOR_ADMIN'] as const;
-const ED = ['EDITOR', 'CHIEF_EDITOR_ADMIN'] as const;
+const VIEW = ['PRODUCTION', 'EDITOR', 'ADMIN'] as const;
+const ED = ['EDITOR', 'ADMIN'] as const;
 const tag = 'Production';
 
 export const productionRoutes = [

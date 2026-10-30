@@ -14,7 +14,7 @@ import { sendEmail } from './mail.service';
 import { revokeAllSessions } from './token.service';
 
 const ROLE_LABEL: Record<Role, string> = {
-  CHIEF_EDITOR_ADMIN: 'Chief Editor / Admin',
+  ADMIN: 'Admin',
   EDITOR: 'Editor',
   REVIEWER: 'Reviewer',
   AUTHOR: 'Author',
@@ -76,11 +76,11 @@ export async function getUser(id: string) {
 }
 
 async function activeAdminCount(excludeId?: string) {
-  return prisma.user.count({ where: { role: Role.CHIEF_EDITOR_ADMIN, status: UserStatus.ACTIVE, ...(excludeId ? { id: { not: excludeId } } : {}) } });
+  return prisma.user.count({ where: { role: Role.ADMIN, status: UserStatus.ACTIVE, ...(excludeId ? { id: { not: excludeId } } : {}) } });
 }
 
 export async function createStaff(input: { email: string; firstName: string; lastName: string; role: Role; designation?: string }, actor: Actor) {
-  if (!STAFF_CREATABLE_ROLES.includes(input.role)) throw new BadRequestError('Only Chief Editor, Editor and Production accounts can be created here');
+  if (!STAFF_CREATABLE_ROLES.includes(input.role)) throw new BadRequestError('Only Editor and Production accounts can be created here');
   if (await prisma.user.findUnique({ where: { email: input.email }, select: { id: true } })) throw new ConflictError('An account with this email already exists', 'EMAIL_EXISTS');
 
   // The account has an unusable random password until the invitee sets one through the invitation link.
@@ -126,19 +126,16 @@ export async function resendInvite(id: string, actor: Actor) {
   return { inviteEmailSent: await sendInvite(user, link, user.reviewerProfile?.reviewerCode) };
 }
 
-const STAFF_ROLES: Role[] = [Role.CHIEF_EDITOR_ADMIN, Role.EDITOR, Role.PRODUCTION];
+const STAFF_ROLES: Role[] = [Role.EDITOR, Role.PRODUCTION];
 
 export async function changeRole(id: string, role: Role, actor: Actor) {
   if (id === actor.id) throw new ForbiddenError('You cannot change your own role');
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError('User not found');
   if (!STAFF_ROLES.includes(user.role) || !STAFF_ROLES.includes(role)) {
-    throw new BadRequestError('Role changes are only supported between Chief Editor, Editor and Production accounts');
+    throw new BadRequestError('Role changes are only supported between Editor and Production accounts');
   }
   if (user.role === role) return publicUser(user);
-  if (user.role === Role.CHIEF_EDITOR_ADMIN && user.status === UserStatus.ACTIVE && (await activeAdminCount(id)) === 0) {
-    throw new ConflictError('At least one active Chief Editor / Admin is required', 'LAST_ADMIN');
-  }
   return transact(async (tx) => {
     const u = await tx.user.update({
       where: { id },
@@ -155,8 +152,8 @@ export async function changeStatus(id: string, status: 'ACTIVE' | 'INACTIVE' | '
   const user = await prisma.user.findUnique({ where: { id } });
   if (!user) throw new NotFoundError('User not found');
   if (user.status === UserStatus.PENDING_VERIFICATION) throw new ConflictError('Account has not been activated yet');
-  if (user.role === Role.CHIEF_EDITOR_ADMIN && status !== 'ACTIVE' && user.status === UserStatus.ACTIVE && (await activeAdminCount(id)) === 0) {
-    throw new ConflictError('At least one active Chief Editor / Admin is required', 'LAST_ADMIN');
+  if (user.role === Role.ADMIN && status !== 'ACTIVE' && user.status === UserStatus.ACTIVE && (await activeAdminCount(id)) === 0) {
+    throw new ConflictError('At least one active Admin is required', 'LAST_ADMIN');
   }
   return transact(async (tx) => {
     const u = await tx.user.update({ where: { id }, data: { status, ...(status === 'ACTIVE' ? { failedLoginCount: 0, lockedUntil: null } : {}) } });
@@ -206,7 +203,7 @@ export async function updateMyProfile(user: Express.AuthUser, input: ProfileInpu
     if (user.role === Role.AUTHOR) {
       const data = { affiliation: input.affiliation, country: input.country, phone: input.phone };
       await tx.authorProfile.upsert({ where: { userId: user.id }, create: { userId: user.id, ...data }, update: data });
-    } else if (user.role === Role.EDITOR || user.role === Role.CHIEF_EDITOR_ADMIN) {
+    } else if (user.role === Role.EDITOR || user.role === Role.ADMIN) {
       const data = { designation: input.designation };
       await tx.editorProfile.upsert({ where: { userId: user.id }, create: { userId: user.id, ...data }, update: data });
     } else if (user.role === Role.REVIEWER) {

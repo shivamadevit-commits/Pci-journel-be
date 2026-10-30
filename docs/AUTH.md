@@ -7,7 +7,7 @@
 2. `POST /auth/verify-email` `{email, otp}` → account becomes `ACTIVE`.
 3. `POST /auth/resend-verification` `{email}` (generic response, cooldown applies).
 
-Only Authors self-register. Staff accounts are created by the Chief Editor (`POST /admin/users`) and reviewers via application → approval; both receive a **set-password invitation link** (single-use, `INVITE_EXPIRY_HOURS`) handled by `POST /auth/reset-password`.
+Only Authors self-register. Staff accounts are created by the Admin (`POST /admin/users`) and reviewers via application → approval; both receive a **set-password invitation link** (single-use, `INVITE_EXPIRY_HOURS`) handled by `POST /auth/reset-password`.
 
 ### Sign-in (OTP required by default, `LOGIN_OTP_REQUIRED=true`)
 1. `POST /auth/login` `{email, password}`

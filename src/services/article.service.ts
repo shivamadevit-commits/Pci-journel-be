@@ -93,8 +93,11 @@ export async function submitArticle(user: Express.AuthUser, input: SubmissionInp
       await tx.manuscriptVersion.create({
         data: { articleId: a.id, versionNumber: 1, kind: 'ORIGINAL', fileId: file.id, titlePageFileId: titleFile?.id, wordCount, createdById: user.id },
       });
+      // While the payment switch is off no APC is due for this submission, and turning it on later must not make it owe one.
       await tx.apcPayment.create({
-        data: { articleId: a.id, status: 'PENDING', amount: cfg.apcDefaultAmount ?? undefined, currency: cfg.apcCurrency ?? undefined },
+        data: cfg.paymentEnabled
+          ? { articleId: a.id, status: 'PENDING', amount: cfg.apcDefaultAmount ?? undefined, currency: cfg.apcCurrency ?? undefined }
+          : { articleId: a.id, status: 'WAIVED', note: 'Submitted while payments were disabled' },
       });
       await recordInitialStatus(tx, a.id, user);
       await recordAudit(tx, {

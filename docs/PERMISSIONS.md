@@ -44,6 +44,7 @@
 | `GET /author/articles/:articleId` |  |  |  |  | ✔ |  |
 | `POST /author/articles/:articleId/versions` |  |  |  |  | ✔ |  |
 | `GET /author/articles/:articleId/payment` |  |  |  |  | ✔ |  |
+| `POST /author/articles/:articleId/payment/verify` |  |  |  |  | ✔ |  |
 | `POST /author/articles/:articleId/payment/checkout` |  |  |  |  | ✔ |  |
 | `GET /author/articles/:articleId/proofs` |  |  |  |  | ✔ |  |
 | `POST /author/articles/:articleId/proofs/:proofId/approve` |  |  |  |  | ✔ |  |
@@ -56,6 +57,8 @@
 | `POST /editorial/articles/:articleId/screening/decision` |  | ✔ | ✔ |  |  |  |
 | `GET /editorial/articles/:articleId/plagiarism` |  | ✔ | ✔ |  |  |  |
 | `POST /editorial/articles/:articleId/plagiarism/initiate` |  | ✔ | ✔ |  |  |  |
+| `POST /editorial/articles/:articleId/plagiarism/run` |  | ✔ | ✔ |  |  |  |
+| `GET /editorial/articles/:articleId/plagiarism/:checkId/report` |  | ✔ | ✔ |  |  |  |
 | `POST /editorial/articles/:articleId/plagiarism/record` |  | ✔ | ✔ |  |  |  |
 | `PUT /editorial/articles/:articleId/plagiarism/:checkId/verdict` |  | ✔ | ✔ |  |  |  |
 | `POST /editorial/articles/:articleId/plagiarism/clearance` |  | ✔ | ✔ |  |  |  |
@@ -104,6 +107,7 @@
 | `POST /publication/articles/:articleId/publish` |  | ✔ | ✔ |  |  |  |
 | `GET /publications` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `GET /publications/:submissionId` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
+| `GET /config/features` |  | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `GET /files/:fileId/download` |  | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `GET /publications/:submissionId/:kind` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
 | `POST /webhooks/payments` | ✔ | ✔ | ✔ | ✔ | ✔ | ✔ |
@@ -114,6 +118,6 @@
 - **Author**: only their own articles, proofs, payment records and notifications. Never sees reviewer identities, assignments, internal notes, plagiarism data; sees reviewer comments only after a final decision and only those the Editor approved.
 - **Reviewer**: only their own assignments; the manuscript view contains no author names/emails/affiliations/title page; manuscript downloads use a neutral filename and have document metadata scrubbed; submitted reviews are locked (also enforced by database triggers).
 - **Editor**: articles assigned to them plus unassigned ones. Sees author and reviewer identities.
-- **Chief Editor / Admin**: all articles, user and role management, configuration, audit logs, editor assignment.
+- **Admin**: all articles, user and role management, configuration, audit logs, editor assignment.
 - **Production**: only accepted articles (Accepted – Production Pending onwards); no reviews, editorial decisions, plagiarism or APC data.
 - **Public**: published articles only (metadata, HTML, PDF).

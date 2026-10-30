@@ -5,9 +5,9 @@ import { ForbiddenError, NotFoundError } from '../utils/errors';
 
 type U = Pick<Express.AuthUser, 'id' | 'role'>;
 
-/** Chief Editor / Admin sees every article; an Editor sees articles assigned to them and unassigned ones. */
+/** Admin sees every article; an Editor sees articles assigned to them and unassigned ones. */
 export function editorialCanAccess(user: U, article: Pick<Article, 'editorId'>): boolean {
-  if (user.role === Role.CHIEF_EDITOR_ADMIN) return true;
+  if (user.role === Role.ADMIN) return true;
   if (user.role === Role.EDITOR) return article.editorId === null || article.editorId === user.id;
   return false;
 }
